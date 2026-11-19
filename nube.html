@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fichajes en Supabase · Servilucar</title>
+<link rel="icon" href="./icons/icon-192.png">
+<style>
+:root{font-family:system-ui,sans-serif;background:#f2f5f9;color:#162c45}
+body{max-width:44rem;margin:auto;padding:1rem}header{display:flex;align-items:center;gap:1rem}
+section{padding:1rem;background:white;border-radius:1rem;margin:1rem 0}
+label{display:block;margin:.75rem 0}input,button{font:inherit;padding:.65rem;border-radius:.5rem}
+input{display:block;max-width:100%;box-sizing:border-box;border:1px solid #687f96}
+button{background:#123b69;color:white;border:0;margin:.25rem .25rem .25rem 0}button:disabled{opacity:.55}
+li{margin:.5rem 0}
+</style>
+</head>
+<body>
+<header><img src="./icons/icon-192.png" alt="" width="56" height="56"><h1>Fichajes en la nube</h1></header>
+<a href="./">Volver a Servilucar Fichajes</a>
+<section id="access">
+<form id="login">
+<label>Correo <input id="email" type="email" autocomplete="username" required></label>
+<label>Contraseña <input id="password" type="password" autocomplete="current-password" required></label>
+<button type="submit">Iniciar sesión</button>
+</form>
+</section>
+<section id="panel" hidden>
+<h2 id="identity"></h2>
+<button id="punch" hidden>Registrar fichaje</button>
+<button id="refresh">Actualizar historial</button>
+<button id="export">Descargar historial CSV</button>
+<button id="logout">Cerrar sesión</button>
+<h3>Últimos fichajes</h3>
+<ul id="history"></ul>
+</section>
+<p id="message" role="status" aria-live="polite"></p>
+<script src="./nube.js" defer></script>
+</body>
+</html>
