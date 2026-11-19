@@ -4,12 +4,17 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SERVILUCAR FICHAJES</title>
 <meta name="theme-color" content="#123b69">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
 <style>
+.app-brand{display:flex;align-items:center;gap:12px}
+.app-brand img{width:52px;height:52px;border-radius:10px}
 :root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#162c45;background:#f2f5f9}*{box-sizing:border-box}body{margin:0}header{background:#123b69;color:white;padding:22px 18px}header h1{margin:0;font-size:22px}header small{opacity:.8}main{max-width:720px;margin:auto;padding:16px}.card{background:white;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px #17304b12}h2{font-size:18px;margin:0 0 12px}button,select,input{font:inherit}button{border:0;border-radius:11px;padding:13px 15px;cursor:pointer;font-weight:650}button.primary{background:#1567bd;color:white}button.secondary{background:#e9f1fa;color:#164f85}button.danger{background:#b73b36;color:white}button:disabled{opacity:.45}.buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}select,input{width:100%;padding:12px;border:1px solid #cbd6e3;border-radius:10px;background:white}label{display:block;font-size:14px;font-weight:600;margin:12px 0 6px}.muted{color:#5c6c7d;font-size:13px}.clock{font-size:32px;font-weight:750;text-align:center;margin:10px}.pill{display:inline-block;background:#e7f3ec;color:#196a41;border-radius:100px;padding:5px 10px;font-size:12px;font-weight:700}.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}.nav button{white-space:nowrap;background:#e5ebf2}.nav button.active{background:#123b69;color:white}.record{padding:12px 0;border-bottom:1px solid #e8edf2}.record:last-child{border:0}.record strong{display:block}.hidden{display:none}footer{text-align:center;color:#64748b;font-size:12px;padding:20px}.notice{padding:12px;border-radius:10px;background:#fff5dd;color:#6b4a0b;font-size:13px}textarea{width:100%}
 </style>
 </head>
 <body>
-<header><h1>SERVILUCAR FICHAJES</h1><small>SERVILUCAR 2025, S.L. · Registro horario</small></header>
+<header class="app-brand"><img src="./icons/icon-192.png" alt="" width="52" height="52"><div><h1>SERVILUCAR FICHAJES</h1><small>SERVILUCAR 2025, S.L. · Registro horario</small></div></header>
 <main>
 <div class="card"><label for="person">Trabajador / perfil</label><select id="person"><option value="manuel">Manuel · Empleado</option><option value="jose">José · Socio trabajador</option><option value="admin">Administrador · Consulta</option></select><p class="muted">Versión de prueba: la selección de perfil todavía no está protegida por contraseña.</p></div>
 <div class="nav"><button class="active" data-tab="inicio">Inicio</button><button data-tab="historial">Historial</button><button data-tab="horarios">Horarios</button><button data-tab="informes">Informes</button><button data-tab="ajustes">Ajustes</button></div>
@@ -41,5 +46,12 @@ function tick(){const d=new Date();$('clock').textContent=d.toLocaleTimeString('
 $('export').addEventListener('click',()=>{const rows=[['ID','Trabajador','Movimiento','Fecha y hora (ISO)'],...records.map(r=>[r.id,names[r.user],r.label,r.at])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='servilucar-fichajes-'+new Date().toISOString().slice(0,10)+'.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)});
 render();
 })();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(error => {
+    console.warn('No se pudo registrar el servicio de la aplicación.', error);
+  });
+}
 </script>
 </body></html>
