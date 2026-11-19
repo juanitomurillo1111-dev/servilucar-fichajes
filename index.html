@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>SERVILUCAR FICHAJES</title>
+<meta name="theme-color" content="#123b69">
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#162c45;background:#f2f5f9}*{box-sizing:border-box}body{margin:0}header{background:#123b69;color:white;padding:22px 18px}header h1{margin:0;font-size:22px}header small{opacity:.8}main{max-width:720px;margin:auto;padding:16px}.card{background:white;border-radius:16px;padding:18px;margin-bottom:14px;box-shadow:0 2px 12px #17304b12}h2{font-size:18px;margin:0 0 12px}button,select,input{font:inherit}button{border:0;border-radius:11px;padding:13px 15px;cursor:pointer;font-weight:650}button.primary{background:#1567bd;color:white}button.secondary{background:#e9f1fa;color:#164f85}button.danger{background:#b73b36;color:white}button:disabled{opacity:.45}.buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}select,input{width:100%;padding:12px;border:1px solid #cbd6e3;border-radius:10px;background:white}label{display:block;font-size:14px;font-weight:600;margin:12px 0 6px}.muted{color:#5c6c7d;font-size:13px}.clock{font-size:32px;font-weight:750;text-align:center;margin:10px}.pill{display:inline-block;background:#e7f3ec;color:#196a41;border-radius:100px;padding:5px 10px;font-size:12px;font-weight:700}.nav{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px}.nav button{white-space:nowrap;background:#e5ebf2}.nav button.active{background:#123b69;color:white}.record{padding:12px 0;border-bottom:1px solid #e8edf2}.record:last-child{border:0}.record strong{display:block}.hidden{display:none}footer{text-align:center;color:#64748b;font-size:12px;padding:20px}.notice{padding:12px;border-radius:10px;background:#fff5dd;color:#6b4a0b;font-size:13px}textarea{width:100%}
+</style>
+</head>
+<body>
+<header><h1>SERVILUCAR FICHAJES</h1><small>SERVILUCAR 2025, S.L. · Registro horario</small></header>
+<main>
+<div class="card"><label for="person">Trabajador / perfil</label><select id="person"><option value="manuel">Manuel · Empleado</option><option value="jose">José · Socio trabajador</option><option value="admin">Administrador · Consulta</option></select><p class="muted">Versión de prueba: la selección de perfil todavía no está protegida por contraseña.</p></div>
+<div class="nav"><button class="active" data-tab="inicio">Inicio</button><button data-tab="historial">Historial</button><button data-tab="horarios">Horarios</button><button data-tab="informes">Informes</button><button data-tab="ajustes">Ajustes</button></div>
+<section id="inicio" class="card"><h2>Mi jornada</h2><div class="clock" id="clock">--:--:--</div><p id="date" style="text-align:center"></p><p><span class="pill" id="status">Sin fichar</span></p><div class="buttons"><button class="primary" id="entrada">Fichar entrada</button><button class="danger" id="salida">Fichar salida</button><button class="secondary" id="pausa">Iniciar descanso</button><button class="secondary" id="reanudar">Terminar descanso</button></div><p class="muted" id="last"></p></section>
+<section id="historial" class="card hidden"><h2>Historial de fichajes</h2><div id="records"></div></section>
+<section id="horarios" class="card hidden"><h2>Horarios</h2><p><strong>Manuel:</strong> lunes a viernes, 09:00–13:00 y 15:30–17:30 (30 horas semanales).</p><p><strong>José:</strong> horario flexible, fichaje voluntario como socio trabajador.</p><p><strong>Administrador:</strong> consulta, sin obligación de fichar en esta configuración.</p><p class="muted">La edición de horarios se añadirá al panel de administración.</p></section>
+<section id="informes" class="card hidden"><h2>Informes</h2><p>Exporta los fichajes guardados en este dispositivo a CSV, compatible con hojas de cálculo.</p><button class="primary" id="export">Exportar CSV</button><p class="muted">La exportación PDF y los informes centralizados se incorporarán en una siguiente fase.</p></section>
+<section id="ajustes" class="card hidden"><h2>Estado de la aplicación</h2><div class="notice">Modo local: los fichajes se guardan únicamente en este navegador y dispositivo. No borres sus datos. Todavía no existe sincronización con Supabase ni identificación segura.</div><p class="muted">Para uso laboral real, antes del despliegue definitivo se configurarán usuarios autenticados, permisos, trazabilidad y copia centralizada.</p></section>
+</main><footer>© SERVILUCAR 2025, S.L. · Versión inicial de pruebas</footer>
+<script>
+(()=>{'use strict';
+const KEY='servilucar_fichajes_local_v1';
+const $=id=>document.getElementById(id);
+let records=[];
+try{const value=JSON.parse(localStorage.getItem(KEY)||'[]');records=Array.isArray(value)?value:[]}catch(e){alert('No se han podido leer los fichajes locales. No se modificará el historial hasta resolverlo.');return}
+const names={manuel:'Manuel',jose:'José',admin:'Administrador'};
+const fmt=d=>new Intl.DateTimeFormat('es-ES',{dateStyle:'medium',timeStyle:'medium'}).format(d);
+const person=()=> $('person').value;
+function current(){return records.filter(r=>r.user===person()).at(-1)}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(records));return true}catch(e){alert('No se ha podido guardar el fichaje. Comprueba el espacio y los permisos del navegador.');return false}}
+function state(){const r=current();return r?r.type:'salida'}
+function render(){const user=person(),s=state(),admin=user==='admin';$('status').textContent=admin?'Modo consulta':({entrada:'Jornada en curso',pausa:'En descanso',reanudar:'Jornada en curso',salida:'Fuera de jornada'})[s];$('entrada').disabled=admin||s!=='salida';$('salida').disabled=admin||s==='salida';$('pausa').disabled=admin||!['entrada','reanudar'].includes(s);$('reanudar').disabled=admin||s!=='pausa';const r=current();$('last').textContent=r?'Último movimiento: '+r.label+' · '+fmt(new Date(r.at)):'Sin movimientos registrados';const selected=admin?records:records.filter(r=>r.user===user);$('records').replaceChildren();if(!selected.length){$('records').textContent='No hay fichajes guardados.'}else{[...selected].reverse().forEach(r=>{const div=document.createElement('div');div.className='record';const strong=document.createElement('strong');strong.textContent=names[r.user]+' · '+r.label;const small=document.createElement('span');small.className='muted';small.textContent=fmt(new Date(r.at));div.append(strong,small);$('records').append(div)})}}
+const labels={entrada:'Entrada',salida:'Salida',pausa:'Inicio de descanso',reanudar:'Fin de descanso'};
+function punch(type){const u=person();if(u==='admin')return;const s=state();const allowed={entrada:['salida'],salida:['entrada','reanudar','pausa'],pausa:['entrada','reanudar'],reanudar:['pausa']};if(!allowed[type].includes(s))return;const entry={id:crypto.randomUUID?crypto.randomUUID():String(Date.now())+'-'+Math.random(),user:u,type,label:labels[type],at:new Date().toISOString()};records.push(entry);if(!save()){records.pop();return}render()}
+Object.keys(labels).forEach(type=>$(type).addEventListener('click',()=>punch(type)));
+$('person').addEventListener('change',render);
+document.querySelectorAll('[data-tab]').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));document.querySelectorAll('main section').forEach(s=>s.classList.toggle('hidden',s.id!==btn.dataset.tab));render()}));
+function tick(){const d=new Date();$('clock').textContent=d.toLocaleTimeString('es-ES');$('date').textContent=d.toLocaleDateString('es-ES',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}tick();setInterval(tick,1000);
+$('export').addEventListener('click',()=>{const rows=[['ID','Trabajador','Movimiento','Fecha y hora (ISO)'],...records.map(r=>[r.id,names[r.user],r.label,r.at])];const csv='\ufeff'+rows.map(row=>row.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='servilucar-fichajes-'+new Date().toISOString().slice(0,10)+'.csv';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)});
+render();
+})();
+</script>
+</body></html>
